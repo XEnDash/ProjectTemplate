@@ -20,15 +20,27 @@ bool G_LoadTexture(Texture **tex, char *filename)
     if(!FILE_Read(&f, buffer))
 	return false;
 
-    uint32 width = *(uint32 *)(&buffer[0]);
+    /*uint32 width = *(uint32 *)(&buffer[0]);
     uint32 height = *(uint32 *)(&buffer[4]);
-    void *pixels = &buffer[8];
+    void *pixels = &buffer[8];*/
+
+    Bitmap bmp;
+    if(!BMP_Load(&bmp, buffer, f.size, filename))
+    {
+	return false;
+    }
+
+    uint32 width = bmp.width;
+    uint32 height = bmp.height;
+    void *pixels = bmp.pixels;
     
     if(!R_LoadTexture(tex, width, height, pixels))
     {
 	MetaLog("R_LoadTexture failed...");
 	return false;
     }
+
+    BMP_Free(&bmp);
 
     ldelete(buffer);
     buffer = 0;
@@ -54,7 +66,7 @@ bool InitGameData(AppData *ad, GameData *gd)
     if(!DoubleLinkedList_Init(&gd->texture_list, GetSizeOfTextureStruct(), 512))
 	return false;
     
-    gd->tex_filename = "../data/test.txd";
+    gd->tex_filename = "../data/test.bmp";
     gd->tex = (Texture *)DoubleLinkedList_GetNew(&gd->texture_list);
     DAssert(gd->tex);
 

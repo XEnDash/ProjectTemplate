@@ -69,7 +69,8 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
 	    FLog("%s", message);
 	}
 
-	ldelete(f->plat_handle);
+	//ldelete(f->plat_handle);
+	MP_Free(&global_filehandle_pool, f->plat_handle);
 	
 	return false;
     }

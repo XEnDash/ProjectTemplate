@@ -6,7 +6,7 @@ IF [%1]==[x86] SET architecture=x86
 SET src=..\src\*.cpp
 SET obj=..\obj\
 SET libs=user32.lib gdi32.lib winmm.lib opengl32.lib
-SET optimization=/O2
+SET optimization=/Od
 SET debug=/Zi
 
 IF %architecture%==x86 GOTO X86

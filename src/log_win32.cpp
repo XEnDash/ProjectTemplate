@@ -28,6 +28,8 @@ uint32 log_line_height;
 bool log_initialized = false;
 bool log_redraw = false;
 
+uint32 log_level;
+
 LRESULT CALLBACK LogWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch(uMsg)
@@ -95,7 +97,7 @@ LRESULT CALLBACK LogWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-bool Log_Init()
+bool Log_Init(uint32 level)
 {
     if(log_buffer)
 	delete log_buffer;
@@ -161,15 +163,28 @@ bool Log_Init()
 
     log_initialized = true;
 
+    Log_SetLevel(level);
+
     Log("=== Log Initialized ===");
     
     return true;
 }
 
-void SLog(const char *s, char *file, uint32 line, bool32 printmeta)
+void Log_SetLevel(uint32 level)
+{
+    DAssert(level >= LOG_LEVEL_NONE && level <= LOG_LEVEL_VERBOSE);
+    log_level = level;
+}
+
+void SLog(const char *s, char *file, uint32 line)
 {
     if(!log_initialized)
 	return;
+
+    if(log_level == LOG_LEVEL_NONE)
+	return;
+    
+    bool32 printmeta = (log_level == LOG_LEVEL_VERBOSE);
 
     //uint32 s_len = STR_Length((char *)s);
 
@@ -220,6 +235,9 @@ void SLog(const char *s, char *file, uint32 line, bool32 printmeta)
 void FLog(const char *s, ...)
 {
     if(!log_initialized)
+	return;
+
+    if(log_level == LOG_LEVEL_NONE)
 	return;
 
     char buffer[4096];

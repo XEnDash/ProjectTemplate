@@ -65,8 +65,7 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("CreateFile Error:");
-	    FLog("%s", message);
+	    FLog("CreateFile Error: %s\n%s", filename, message);
 	}
 
 	//ldelete(f->plat_handle);
@@ -82,8 +81,7 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("GetFileSizeEx Error:");
-	    FLog("%s", message);
+	    FLog("GetFileSizeEx Error: %s\n%s", filename, message);
 	}
 	
 	return false;
@@ -109,7 +107,7 @@ bool FILE_Read(File *f, void *buffer)
     
     if(f->plat_handle->handle == INVALID_HANDLE_VALUE)
     {
-	FLog("FILE_Read error, file handle invalid.");
+	FLog("FILE_Read error, file handle invalid: %s", f->filename);
 	return false;
     }
     
@@ -119,8 +117,7 @@ bool FILE_Read(File *f, void *buffer)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("FILE_Read Error:");
-	    FLog("%s", message);
+	    FLog("FILE_Read Error: %s\n%s", f->filename, message);
 	}
 	
 	return false;
@@ -136,7 +133,7 @@ bool FILE_Write(File *f, void *buffer, uint32 size)
     
     if(f->plat_handle->handle == INVALID_HANDLE_VALUE)
     {
-	MetaLog("FILE_Write error, file handle invalid.");
+	FLog("FILE_Write error, file handle invalid: %s", f->filename);
 	return false;
     }
 
@@ -146,8 +143,7 @@ bool FILE_Write(File *f, void *buffer, uint32 size)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("FILE_Write Error:");
-	    FLog("%s", message);
+	    FLog("FILE_Write Error: %s\n%s", f->filename, message);
 	}
 	
 	return false;
@@ -165,8 +161,7 @@ void FILE_Close(File *f)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("FILE_Close Error:");
-	    FLog("%s", message);
+	    FLog("FILE_Close Error: %s\n%s", f->filename, message);
 	}
 
 	return;
@@ -184,7 +179,7 @@ bool FILE_Clear(File *f)
 
     if(f->plat_handle->handle == INVALID_HANDLE_VALUE)
     {
-	MetaLog("FILE_Clear error, file handle invalid.");
+	FLog("FILE_Clear error, file handle invalid: %s", f->filename);
 	return false;
     }
 
@@ -193,10 +188,8 @@ bool FILE_Clear(File *f)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    MetaLog("FILE_Clear Error:");
-	    FLog("%s", message);
+	    FLog("FILE_Clear Error: %s\n%s", f->filename, message);
 	}
-
 	
 	return false;
     }

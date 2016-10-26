@@ -114,7 +114,7 @@ uint64 App_GetTicks()
     
     if(!QueryPerformanceCounter(&counter))
     {
-	MetaLog("QueryPerformanceCounter failed.");
+	Log("QueryPerformanceCounter failed.");
 	return 0;
     }
 
@@ -129,7 +129,7 @@ double App_GetTimeDifference(uint64 start, uint64 end)
     
     if(!QueryPerformanceFrequency(&freq))
     {
-	MetaLog("QueryPerformanceFrequency failed.");
+	Log("QueryPerformanceFrequency failed.");
 	return 0;
     }
 
@@ -144,7 +144,7 @@ double App_GetTime()
     
     if(!QueryPerformanceFrequency(&freq))
     {
-	MetaLog("QueryPerformanceFrequency failed.");
+	Log("QueryPerformanceFrequency failed.");
 	return 0;
     }
 
@@ -154,7 +154,7 @@ double App_GetTime()
     
     if(!QueryPerformanceCounter(&counter))
     {
-	MetaLog("QueryPerformanceCounter failed.");
+	Log("QueryPerformanceCounter failed.");
 	return 0;
     }
 
@@ -364,7 +364,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     srand(time(0));
     
-    if(!Log_Init())
+    if(!Log_Init(LOG_LEVEL_VERBOSE))
     {
 	App_MessageBox("Failed to init logging system!", "Error");
 	return -1;
@@ -372,7 +372,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!FILE_InitGlobalFilePool(512))
     {
-	MetaLog("Failed to init file memory pool!");
+	Log("Failed to init file memory pool!");
 	return -1;
     }
     
@@ -381,7 +381,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     if(!InitAppData(ad))
     {
-	MetaLog("InitAppData failed.");
+	Log("InitAppData failed.");
 	Quit();
 	return -1;
     }
@@ -400,7 +400,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!RegisterClass(&wndclass))
     {
-	MetaLog("RegisterClass failed.");
+	Log("RegisterClass failed.");
 	Quit();
 	return -1;
     }
@@ -410,7 +410,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     if(!hwnd)
     {
-	MetaLog("CreateWindow failed.");
+	Log("CreateWindow failed.");
 	Quit();
 	return -1;
     }
@@ -426,7 +426,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!R_Init(&rid))
     {
-	MetaLog("R_Init failed.");
+	Log("R_Init failed.");
 	return -1;
     }
 
@@ -435,7 +435,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     if(!InitGameData(ad, gd))
     {
-	MetaLog("InitGameData failed.");
+	Log("InitGameData failed.");
 	Quit();
 	return -1;
     }

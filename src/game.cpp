@@ -36,7 +36,7 @@ bool G_LoadTexture(Texture **tex, char *filename)
     
     if(!R_LoadTexture(tex, width, height, pixels))
     {
-	MetaLog("R_LoadTexture failed...");
+	Log("R_LoadTexture failed...");
 	return false;
     }
 

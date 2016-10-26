@@ -54,13 +54,13 @@ bool R_Init(RendererInitData *rid)
     HGLRC context = wglCreateContext(rid->dc);
     if(!context)
     {
-	MetaLog("wglCreateContext failed.");
+	Log("wglCreateContext failed.");
 	return false;
     }
     
     if(!wglMakeCurrent(rid->dc, context))
     {
-	MetaLog("wglMakeCurrent failed.");
+	Log("wglMakeCurrent failed.");
 	return false;
     }
 

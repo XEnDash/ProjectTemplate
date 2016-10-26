@@ -59,7 +59,7 @@ public:
 #define DAssert(b) { if(b == 0) {		\
 	    char buffer[1024]; \
 	    sprintf(buffer, "file: %s | line: %i", __FILE__, __LINE__); \
-	    FLog("Assertion: %s", buffer); \
+	    FLog("Assertion: %s", buffer);		\
 	    UpdateLogDisplay(); \
 	    DumpLogToFile(); \
 	    App_MessageBox(buffer, "Assertion"); \

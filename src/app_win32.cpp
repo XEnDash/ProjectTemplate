@@ -202,7 +202,7 @@ void DeleteAppData(AppData *ad)
 void UpdateAppData(GameData *gd, HDC dc)
 {
     DAssert(gd);
-    
+
     R_Begin();
 
     if(gd->tex)
@@ -297,6 +297,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		    ad->gamepad.r = true;
 		} break;
+		case 'V':
+		{
+		    ad->gamepad.v = true;
+		} break;
 	    }
 	} break;
 
@@ -343,6 +347,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case 'R':
 		{
 		    ad->gamepad.r = false;
+		} break;
+		case 'V':
+		{
+		    ad->gamepad.v = false;
 		} break;
 	    }
 	} break;
@@ -453,14 +461,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     double sleep = 0;
     double desired_fps = 1.0 / (double)game_refresh_rate_hz;
 
-    // NOTE(daniel): if vsync is enabled SwapBuffers will sleep for us, if not
-    // we sleep ourselves
-    bool to_sleep = !R_IsVSyncEnabled();
+    bool to_sleep;
     
     ad->dt = desired_fps;
 
     while(ad->program_state)
     {
+	// NOTE(daniel): if vsync is enabled SwapBuffers will sleep for us, if not
+	// we sleep ourselves
+	to_sleep = !R_IsVSyncEnabled();
+	
 	cur_time = App_GetTicks();
 	time_elapsed = App_GetTimeDifference(prev_time, cur_time);
 	prev_time = cur_time;

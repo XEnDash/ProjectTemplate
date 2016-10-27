@@ -74,8 +74,8 @@ bool R_Init(RendererInitData *rid)
     
     glEnable(GL_TEXTURE_2D);
 
-    R_EnableVSync();
-    //R_DisableVSync();
+    //R_EnableVSync();
+    R_DisableVSync();
     
     return true;
 }

@@ -7,7 +7,7 @@ struct Gamepad
     bool up, down, left, right;
     bool w, a, s, d;
     bool space;
-    bool r;
+    bool r, v;
 };
 
 struct AppData

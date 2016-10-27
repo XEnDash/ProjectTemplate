@@ -205,6 +205,20 @@ void UpdateGameData(AppData *ad, GameData *gd)
 	Log("=== Done reloading texture ===");
     }
 
+    if(ad->gamepad.v && !ad->gamepad_prev.v)
+    {
+	if(R_IsVSyncEnabled())
+	{
+	    R_DisableVSync();
+	    Log("VSync Enabled!");
+	}
+	else
+	{
+	    R_EnableVSync();
+	    Log("VSync Disabled!");
+	}
+    }
+
     ad->gamepad_prev = ad->gamepad;
 }
 

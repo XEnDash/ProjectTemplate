@@ -36,7 +36,7 @@ bool G_LoadTexture(Texture **tex, char *filename)
     
     if(!R_LoadTexture(tex, width, height, pixels))
     {
-	Log("R_LoadTexture failed...");
+	LogError("R_LoadTexture failed...");
 	return false;
     }
 
@@ -210,11 +210,19 @@ void UpdateGameData(AppData *ad, GameData *gd)
 	if(R_IsVSyncEnabled())
 	{
 	    R_DisableVSync();
-	    Log("VSync Enabled!");
 	}
 	else
 	{
 	    R_EnableVSync();
+	}
+
+	// NOTE(daniel): this gets the answer from the driver, which is why we call the function twice
+	if(R_IsVSyncEnabled())
+	{
+	    Log("VSync Enabled!");
+	}
+	else
+	{
 	    Log("VSync Disabled!");
 	}
     }
@@ -224,11 +232,11 @@ void UpdateGameData(AppData *ad, GameData *gd)
 
 void DeleteGameData(AppData *ad, GameData *gd)
 {
-    DAssert(ad);
-    DAssert(gd);
-
-    DoubleLinkedList_DestroyList(&gd->sprite_list);
+    if(gd)
+    {
+	DoubleLinkedList_DestroyList(&gd->sprite_list);
     
-    G_UnloadTexture(&gd->tex);
-    DoubleLinkedList_DestroyList(&gd->texture_list);
+	G_UnloadTexture(&gd->tex);
+	DoubleLinkedList_DestroyList(&gd->texture_list);
+    }
 }

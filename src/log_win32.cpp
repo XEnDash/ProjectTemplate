@@ -172,11 +172,11 @@ bool Log_Init(uint32 level)
 
 void Log_SetLevel(uint32 level)
 {
-    DAssert(level >= LOG_LEVEL_NONE && level <= LOG_LEVEL_VERBOSE);
+    DAssert(level >= LOG_LEVEL_NONE && level <= LOG_LEVEL_EVERYTHING);
     log_level = level;
 }
 
-void SLog(const char *s, char *file, uint32 line)
+void SLog(const char *s, char *file, uint32 line, bool print_meta)
 {
     if(!log_initialized)
 	return;
@@ -184,11 +184,12 @@ void SLog(const char *s, char *file, uint32 line)
     if(log_level == LOG_LEVEL_NONE)
 	return;
     
-    bool32 printmeta = (log_level == LOG_LEVEL_VERBOSE);
+    if(log_level == LOG_LEVEL_EVERYTHING)
+	print_meta = true;
 
     //uint32 s_len = STR_Length((char *)s);
 
-    if(printmeta)
+    if(print_meta)
     {
 	char buffer[4096];
 	sprintf(buffer, "%s [file=%s, line=%i]", s, file, line);

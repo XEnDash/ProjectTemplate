@@ -54,17 +54,21 @@ bool R_Init(RendererInitData *rid)
     HGLRC context = wglCreateContext(rid->dc);
     if(!context)
     {
-	Log("wglCreateContext failed.");
+	LogError("wglCreateContext failed.");
 	return false;
     }
     
     if(!wglMakeCurrent(rid->dc, context))
     {
-	Log("wglMakeCurrent failed.");
+	LogError("wglMakeCurrent failed.");
 	return false;
     }
 
-    LoadOpenGLExtensions();
+    if(!LoadOpenGLExtensions())
+    {
+	LogError("failed to load OpenGL Extensions.");
+	//return false;
+    }
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -74,8 +78,8 @@ bool R_Init(RendererInitData *rid)
     
     glEnable(GL_TEXTURE_2D);
 
-    //R_EnableVSync();
-    R_DisableVSync();
+    R_EnableVSync();
+    //R_DisableVSync();
     
     return true;
 }

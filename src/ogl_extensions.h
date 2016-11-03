@@ -9,4 +9,4 @@
 extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 extern PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 
-void LoadOpenGLExtensions();
+bool LoadOpenGLExtensions();

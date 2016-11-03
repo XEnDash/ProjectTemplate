@@ -2,6 +2,21 @@
 
 #include "defines.h"
 
+struct MachineData
+{
+    uint32 oem_id;
+    uint16 processor_architecture;
+    uint32 page_size;
+    void *minimum_application_address_ptr;
+    void *maximum_application_address_ptr;
+    uint32 *active_processor_mask_ptr;
+    uint32 num_of_processors;
+    uint32 processors_type;
+    uint32 alloc_granularity;
+    uint16 processor_level;
+    uint16 processor_revision;
+};
+
 struct Gamepad
 {
     bool up, down, left, right;
@@ -12,6 +27,8 @@ struct Gamepad
 
 struct AppData
 {
+    MachineData md;
+    
     float dt;
     uint16 win_w, win_h;
     uint16 scr_w, scr_h;

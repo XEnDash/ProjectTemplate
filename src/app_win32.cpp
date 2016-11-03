@@ -114,7 +114,7 @@ uint64 App_GetTicks()
     
     if(!QueryPerformanceCounter(&counter))
     {
-	Log("QueryPerformanceCounter failed.");
+	LogError("QueryPerformanceCounter failed.");
 	return 0;
     }
 
@@ -129,7 +129,7 @@ double App_GetTimeDifference(uint64 start, uint64 end)
     
     if(!QueryPerformanceFrequency(&freq))
     {
-	Log("QueryPerformanceFrequency failed.");
+	LogError("QueryPerformanceFrequency failed.");
 	return 0;
     }
 
@@ -144,7 +144,7 @@ double App_GetTime()
     
     if(!QueryPerformanceFrequency(&freq))
     {
-	Log("QueryPerformanceFrequency failed.");
+	LogError("QueryPerformanceFrequency failed.");
 	return 0;
     }
 
@@ -154,7 +154,7 @@ double App_GetTime()
     
     if(!QueryPerformanceCounter(&counter))
     {
-	Log("QueryPerformanceCounter failed.");
+	LogError("QueryPerformanceCounter failed.");
 	return 0;
     }
 
@@ -179,10 +179,72 @@ void ProcessAppEvents()
     }
 }
 
+void QueryHardwareInfo(MachineData *md)
+{
+    DAssert(md);
+    
+    SYSTEM_INFO sys_info = { 0 };
+    GetSystemInfo(&sys_info);
+
+    md->oem_id = sys_info.dwOemId;
+    md->processor_architecture = sys_info.wProcessorArchitecture;
+    md->page_size = sys_info.dwPageSize;
+    md->minimum_application_address_ptr = sys_info.lpMinimumApplicationAddress;
+    md->maximum_application_address_ptr = sys_info.lpMaximumApplicationAddress;
+    md->active_processor_mask_ptr = (uint32 *)sys_info.dwActiveProcessorMask;
+    md->num_of_processors = sys_info.dwNumberOfProcessors;
+    md->processors_type = sys_info.dwProcessorType;
+    md->alloc_granularity = sys_info.dwAllocationGranularity;
+    md->processor_level = sys_info.wProcessorLevel;
+    md->processor_revision = sys_info.wProcessorRevision;
+
+    Log("\nMachine Information:");
+    FLog("OEM ID: %u", md->oem_id);
+
+    char *str = 0;
+    switch(md->processor_architecture)
+    {
+	case PROCESSOR_ARCHITECTURE_AMD64: { str = "AMD64"; } break;
+	case PROCESSOR_ARCHITECTURE_ARM: { str = "ARM"; } break;
+	case PROCESSOR_ARCHITECTURE_IA64: { str = "IA64"; } break;
+	case PROCESSOR_ARCHITECTURE_INTEL: { str = "X86"; } break;
+	case PROCESSOR_ARCHITECTURE_UNKNOWN: { str = "unkown"; } break;
+    }
+    FLog("Processor Architecture: %s", str);
+    
+    FLog("Page Size: %u", md->page_size);
+    FLog("Minimum Application Address: 0x%x", md->minimum_application_address_ptr);
+    FLog("Maximum Application Address: 0x%x", md->maximum_application_address_ptr);
+    FLog("Active Processor Mask : 0x%x", md->active_processor_mask_ptr);
+    FLog("Number Of Processors: %u", md->num_of_processors);
+
+    str = 0;
+    switch(md->processors_type)
+    {
+	case PROCESSOR_INTEL_386 : { str = "INTEL 386"; } break;
+	case PROCESSOR_INTEL_486 : { str = "INTEL 486"; } break;
+	case PROCESSOR_INTEL_PENTIUM : { str = "INTEL Pentium"; } break;
+	case PROCESSOR_INTEL_IA64 : { str = "Intel Itanium 64"; } break;
+	case PROCESSOR_AMD_X8664 : { str = "x86//x64"; } break;
+	    //case PROCESSOR_ARM : { str = "ARM"; } break; // TODO(daniel): PROCESSOR_ARM is not defined???
+    }
+    FLog("Processor Type: %u", str);
+    
+    FLog("Allocation Granularity: %u", md->alloc_granularity);
+    FLog("Processor Level: %u", md->processor_level);
+    FLog("Processor Revision: %u", md->processor_revision);
+
+    // TODO(daniel): Log extra info, such as time & date, user name, anything we might want for testing
+    
+    Log("");
+}
+
 bool InitAppData(AppData *ad)
 {
     DAssert(ad);
-    
+
+    QueryHardwareInfo(&ad->md);
+
     ad->win_w = WINDOW_WIDTH;
     ad->win_h = WINDOW_HEIGHT;
     ad->scr_w = SCREEN_WIDTH;
@@ -196,7 +258,10 @@ bool InitAppData(AppData *ad)
 
 void DeleteAppData(AppData *ad)
 {
-    DAssert(ad);
+    if(ad)
+    {
+	
+    }
 }
 
 void UpdateAppData(GameData *gd, HDC dc)
@@ -224,8 +289,17 @@ void Quit()
     DeleteGameData(ad, gd);
     DeleteAppData(ad);
 
-    ldelete(gd);
-    ldelete(ad);
+    if(gd)
+    {
+	ldelete(gd);
+	gd = 0;
+    }
+
+    if(ad)
+    {
+	ldelete(ad);
+	ad = 0;
+    }
     
     DumpLogToFile();
 
@@ -364,7 +438,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // NOTE(daniel): makes the windows scheduler timer check every 1 ms
     uint32 scheduler_period_ms = 1;
@@ -372,7 +446,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     srand(time(0));
     
-    if(!Log_Init(LOG_LEVEL_VERBOSE))
+    if(!Log_Init(LOG_LEVEL_SIMPLE))
     {
 	App_MessageBox("Failed to init logging system!", "Error");
 	return -1;
@@ -380,16 +454,18 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!FILE_InitGlobalFilePool(512))
     {
-	Log("Failed to init file memory pool!");
+	App_MessageBox("Failed to init file memory pool!", "Error");
 	return -1;
     }
-    
+
+    // NOTE(daniel): From here on out it is possible to dump the log to a file.
+
     ad = (AppData *)lnew(sizeof(AppData));
     DAssert(ad);
     
     if(!InitAppData(ad))
     {
-	Log("InitAppData failed.");
+	LogError("InitAppData failed.");
 	Quit();
 	return -1;
     }
@@ -408,7 +484,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!RegisterClass(&wndclass))
     {
-	Log("RegisterClass failed.");
+	LogError("RegisterClass failed.");
 	Quit();
 	return -1;
     }
@@ -418,7 +494,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     
     if(!hwnd)
     {
-	Log("CreateWindow failed.");
+	LogError("CreateWindow failed.");
 	Quit();
 	return -1;
     }
@@ -434,7 +510,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if(!R_Init(&rid))
     {
-	Log("R_Init failed.");
+	LogError("R_Init failed.");
 	return -1;
     }
 
@@ -524,9 +600,15 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
     }
 
+    timeEndPeriod(scheduler_period_ms);
+
+    return 0;
+}
+
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+    uint32 result = WinMainWrap(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     Quit();
 
-    timeEndPeriod(scheduler_period_ms);
-    
-    return 0;
+    return result;
 }

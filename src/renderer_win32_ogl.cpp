@@ -238,9 +238,7 @@ bool32 R_IsVSyncExtensionsAvilable()
 	s_R_IsVSyncExtensionsAvilable_checked = true;
     }
 
-    //return s_R_IsVSyncExtensionsAvilable_answer;
-
-    return false;
+    return s_R_IsVSyncExtensionsAvilable_answer;
 }
 
 bool32 R_IsVSyncEnabled()

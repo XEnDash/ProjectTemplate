@@ -9,4 +9,5 @@
 extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 extern PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 
-bool LoadOpenGLExtensions();
+bool32 LoadOpenGLExtensions();
+bool32 IsOGLExtensionAvilable(const char *str);

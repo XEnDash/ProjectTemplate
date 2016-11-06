@@ -7,6 +7,7 @@
 #include "app.h"
 #include "string_functions.h"
 #include "file.h"
+#include "umath.h"
 
 #define LOG_CLASS_NAME "logCN"
 #define LOG_WIDTH 640
@@ -24,6 +25,10 @@ int32 log_scroll_last_pos = 0;
 
 uint32 log_number_of_lines = 0;
 uint32 log_line_height;
+
+uint32 log_indent_level = 0;
+const uint32 log_max_indent_level = 512;
+const uint32 log_indent_increment = 8;
 
 bool log_initialized = false;
 bool log_redraw = false;
@@ -189,40 +194,31 @@ void SLog(const char *s, char *file, uint32 line, bool print_meta)
 
     //uint32 s_len = STR_Length((char *)s);
 
+    log_indent_level = min32(log_indent_level, log_max_indent_level);
+    char indentation_string[log_max_indent_level];
+    for(uint32 i = 0; i < log_indent_level; i++)
+	indentation_string[i] = ' ';
+    indentation_string[log_indent_level] = 0;
+
+    char buffer[4096];
     if(print_meta)
-    {
-	char buffer[4096];
-	sprintf(buffer, "%s [file=%s, line=%i]", s, file, line);
-    
-	uint32 s_len = STR_Length((char *)buffer);
-
-	if(log_buffer_used_size + s_len + 1 > log_buffer_size)
-	{
-	    App_MessageBox("Log size limit reached, please allocate more memory for the log", "Error");
-	    log_initialized = false;
-	    return;
-	}
-    
-	sprintf(log_buffer + log_buffer_used_size, buffer);
-	log_buffer_used_size += s_len;
-
-	DebugOutputLog(buffer);
-    }
+	sprintf(buffer, "%s%s [file=%s, line=%i]", indentation_string, s, file, line);
     else
+	sprintf(buffer, "%s%s", indentation_string, s);
+    
+    uint32 s_len = STR_Length((char *)buffer);
+
+    if(log_buffer_used_size + s_len + 1 > log_buffer_size)
     {
-	uint32 s_len = STR_Length((char *)s);
-        if(log_buffer_used_size + s_len + 1 > log_buffer_size)
-	{
-	    App_MessageBox("Log size limit reached, please allocate more memory for the log", "Error");
-	    log_initialized = false;
-	    return;
-	}
-
-	sprintf(log_buffer + log_buffer_used_size, s);
-	log_buffer_used_size += s_len;
-
-	DebugOutputLog(s);
+	App_MessageBox("Log size limit reached, please allocate more memory for the log", "Error");
+	log_initialized = false;
+	return;
     }
+    
+    sprintf(log_buffer + log_buffer_used_size, buffer);
+    log_buffer_used_size += s_len;
+
+    DebugOutputLog(buffer);
     
     sprintf(log_buffer + log_buffer_used_size, "\n");
     log_buffer_used_size += 1;
@@ -241,24 +237,30 @@ void FLog(const char *s, ...)
     if(log_level == LOG_LEVEL_NONE)
 	return;
 
+    log_indent_level = min32(log_indent_level, log_max_indent_level);
+    char indentation_string[log_max_indent_level];
+    for(uint32 i = 0; i < log_indent_level; i++)
+	indentation_string[i] = ' ';
+    indentation_string[log_indent_level] = 0;
+
     char buffer[4096];
 
     va_list ap;
     va_start(ap, s);
-    
     vsprintf(buffer, s, ap);
-    
     va_end(ap);
 
     uint32 buf_len = STR_Length((char *)buffer);
 
-    if(log_buffer_used_size + buf_len + 1 > log_buffer_size)
+    if(log_buffer_used_size + buf_len + log_indent_level + 1 > log_buffer_size)
     {
 	App_MessageBox("Log size limit reached, please allocate more memory for the log", "Error");
 	log_initialized = false;
 	return;
     }
-    
+
+    sprintf(log_buffer + log_buffer_used_size, indentation_string);
+    log_buffer_used_size += log_indent_level;
     sprintf(log_buffer + log_buffer_used_size, buffer);
     log_buffer_used_size += buf_len;
     sprintf(log_buffer + log_buffer_used_size, "\n");
@@ -269,6 +271,26 @@ void FLog(const char *s, ...)
     
     log_number_of_lines++;
     log_redraw = true;
+}
+
+void Log_BeginSection(const char *s)
+{
+    log_indent_level = min32(log_indent_level, log_max_indent_level);
+    char indentation_string[log_max_indent_level];
+    for(uint32 i = 0; i < log_indent_level; i++)
+	indentation_string[i] = ' ';
+    indentation_string[log_indent_level] = 0;
+    
+    FLog("%s%s {", indentation_string, s);
+    log_indent_level += log_indent_increment;
+
+    log_indent_level = min32(log_indent_level, log_max_indent_level);
+}
+
+void Log_EndSection()
+{
+    log_indent_level -= log_indent_increment;
+    SLog("}", 0, 0, false);
 }
 
 void UpdateLogDisplay()

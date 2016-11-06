@@ -195,35 +195,43 @@ void UpdateGameData(AppData *ad, GameData *gd)
     
     if(gp.r && !gpp.r)
     {
-	Log("=== Reloading texture ===");
+	Log_BeginSection("=== Reloading texture ===");
 	G_UnloadTexture(&gd->tex);
 	if(!G_LoadTexture(&gd->tex, gd->tex_filename))
 	{
 	    FLog("Failed to load texture: %s", gd->tex_filename);
 	    //ad->program_state = 0;
 	}
-	Log("=== Done reloading texture ===");
+	//Log("=== Done reloading texture ===");
+	Log_EndSection();
     }
 
     if(ad->gamepad.v && !ad->gamepad_prev.v)
     {
-	if(R_IsVSyncEnabled())
+	if(!R_IsVSyncExtensionsAvilable())
 	{
-	    R_DisableVSync();
+	    Log("VSync Unavailable!");
 	}
 	else
 	{
-	    R_EnableVSync();
-	}
+	    if(R_IsVSyncEnabled())
+	    {
+		R_DisableVSync();
+	    }
+	    else
+	    {
+		R_EnableVSync();
+	    }
 
-	// NOTE(daniel): this gets the answer from the driver, which is why we call the function twice
-	if(R_IsVSyncEnabled())
-	{
-	    Log("VSync Enabled!");
-	}
-	else
-	{
-	    Log("VSync Disabled!");
+	    // NOTE(daniel): this gets the answer from the driver, which is why we call the function twice
+	    if(R_IsVSyncEnabled())
+	    {
+		Log("VSync Enabled!");
+	    }
+	    else
+	    {
+		Log("VSync Disabled!");
+	    }
 	}
     }
 

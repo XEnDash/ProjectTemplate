@@ -22,6 +22,30 @@ struct RendererInitData //NOTE(daniel): must be the same as in app_win32.cpp
     uint16 scr_w, scr_h;
 };
 
+void QueryGLDriverInformation()
+{
+    Log_BeginSection("Renderer Information:");
+    const GLubyte *str;
+    
+    str = glGetString(GL_VENDOR);
+    FLog("Vendor: %s", str);
+    str = glGetString(GL_RENDERER);
+    FLog("Card: %s", str);
+    str = glGetString(GL_VERSION);
+    FLog("OpenGL Version: %s", str);
+
+    // TODO(daniel): these stuff need glext.h
+    /*str = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    FLog("GLSL Version: %s", str);
+
+    int context;
+    glGetIntegerv(WGL_CONTEXT_PROFILE_MASK_ARB, &context);
+    char *answer = (context & WGL_CONTEXT_CORE_PROFILE_BIT_ARB) ? "core" : "compatibility";
+    FLog("GL Context Profile Flag: %s", answer);*/
+
+    Log_EndSection();
+}
+
 bool R_Init(RendererInitData *rid)
 {
     PIXELFORMATDESCRIPTOR pfd = { 
@@ -80,6 +104,8 @@ bool R_Init(RendererInitData *rid)
 
     R_EnableVSync();
     //R_DisableVSync();
+
+    QueryGLDriverInformation();
     
     return true;
 }
@@ -197,6 +223,24 @@ void R_EnableVSync()
 void R_DisableVSync()
 {
     wglSwapIntervalEXT(0);
+}
+
+bool32 R_IsVSyncExtensionsAvilable()
+{
+
+    static bool32 s_R_IsVSyncExtensionsAvilable_checked = false;
+    static bool32 s_R_IsVSyncExtensionsAvilable_answer = false;
+
+    if(!s_R_IsVSyncExtensionsAvilable_checked)
+    {
+	s_R_IsVSyncExtensionsAvilable_answer = (!IsOGLExtensionAvilable("wglSwapIntervalEXT") ||
+					      !IsOGLExtensionAvilable("wglGetSwapIntervalEXT"));
+	s_R_IsVSyncExtensionsAvilable_checked = true;
+    }
+
+    //return s_R_IsVSyncExtensionsAvilable_answer;
+
+    return false;
 }
 
 bool32 R_IsVSyncEnabled()

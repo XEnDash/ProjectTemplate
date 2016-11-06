@@ -198,7 +198,7 @@ void QueryHardwareInfo(MachineData *md)
     md->processor_level = sys_info.wProcessorLevel;
     md->processor_revision = sys_info.wProcessorRevision;
 
-    Log("\nMachine Information:");
+    Log_BeginSection("Machine Information:");
     FLog("OEM ID: %u", md->oem_id);
 
     char *str = 0;
@@ -211,7 +211,7 @@ void QueryHardwareInfo(MachineData *md)
 	case PROCESSOR_ARCHITECTURE_UNKNOWN: { str = "unkown"; } break;
     }
     FLog("Processor Architecture: %s", str);
-    
+
     FLog("Page Size: %u", md->page_size);
     FLog("Minimum Application Address: 0x%x", md->minimum_application_address_ptr);
     FLog("Maximum Application Address: 0x%x", md->maximum_application_address_ptr);
@@ -236,7 +236,7 @@ void QueryHardwareInfo(MachineData *md)
 
     // TODO(daniel): Log extra info, such as time & date, user name, anything we might want for testing
     
-    Log("");
+    Log_EndSection();
 }
 
 bool InitAppData(AppData *ad)

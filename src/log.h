@@ -13,6 +13,8 @@ bool Log_Init(uint32 level);
 void Log_SetLevel(uint32 level);
 void SLog(const char *s, char *file, uint32 line, bool print_meta);
 void FLog(const char *s, ...);
+void Log_BeginSection(const char *s);
+void Log_EndSection();
 void UpdateLogDisplay();
 bool DumpLogToFile();
 

@@ -26,4 +26,5 @@ void R_SetTexture(Texture *t);
 
 void R_EnableVSync();
 void R_DisableVSync();
+bool32 R_IsVSyncExtensionsAvilable();
 bool32 R_IsVSyncEnabled();

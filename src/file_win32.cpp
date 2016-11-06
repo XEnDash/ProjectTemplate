@@ -65,7 +65,8 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("CreateFile Error: %s\n%s", filename, message);
+	    FLog("CreateFile Error: %s", filename);
+	    FLog("Last Error Message: %s", message);
 	}
 
 	//ldelete(f->plat_handle);
@@ -81,7 +82,8 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("GetFileSizeEx Error: %s\n%s", filename, message);
+	    FLog("GetFileSizeEx Error: %s", filename);
+	    FLog("Last Error Message: %s", message);
 	}
 	
 	return false;
@@ -117,7 +119,8 @@ bool FILE_Read(File *f, void *buffer)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("FILE_Read Error: %s\n%s", f->filename, message);
+	    FLog("FILE_Read Error: %s", f->filename);
+	    FLog("Last Error Message: %s", message);
 	}
 	
 	return false;
@@ -143,7 +146,8 @@ bool FILE_Write(File *f, void *buffer, uint32 size)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("FILE_Write Error: %s\n%s", f->filename, message);
+	    FLog("FILE_Write Error: %s", f->filename);
+	    FLog("Last Error Message: %s", message);
 	}
 	
 	return false;
@@ -161,7 +165,8 @@ void FILE_Close(File *f)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("FILE_Close Error: %s\n%s", f->filename, message);
+	    FLog("FILE_Close Error: %s", f->filename);
+	    FLog("Last Error Message: %s", message);
 	}
 
 	return;
@@ -188,7 +193,8 @@ bool FILE_Clear(File *f)
 	char message[4096];
 	if(App_GetLastErrorMessage(message, 4096))
 	{
-	    FLog("FILE_Clear Error: %s\n%s", f->filename, message);
+	    FLog("FILE_Clear Error: %s", f->filename);
+	    FLog("Last Error Message: %s", message);
 	}
 	
 	return false;

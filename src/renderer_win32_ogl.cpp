@@ -227,7 +227,6 @@ void R_DisableVSync()
 
 bool32 R_IsVSyncExtensionsAvilable()
 {
-
     static bool32 s_R_IsVSyncExtensionsAvilable_checked = false;
     static bool32 s_R_IsVSyncExtensionsAvilable_answer = false;
 

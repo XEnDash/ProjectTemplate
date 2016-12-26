@@ -4,6 +4,7 @@
 #include "file.h"
 #include "sprite.h"
 #include "bitmap.h"
+#include "sstring.h"
 
 #define DEBUG_SPRITE_LIST_MAX 32 // 1024*64
 
@@ -62,6 +63,8 @@ bool InitGameData(AppData *ad, GameData *gd)
 {
     DAssert(ad);
     DAssert(gd);
+
+    gd->str = String("Hello World!");
 
     if(!DoubleLinkedList_Init(&gd->texture_list, GetSizeOfTextureStruct(), 512))
 	return false;

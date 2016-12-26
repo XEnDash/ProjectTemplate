@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "linked_list.h"
 #include "double_linked_list.h"
+#include "sstring.h"
 
 struct GameData
 {
@@ -17,6 +18,8 @@ struct GameData
     //MemoryPool mp;
     DoubleLinkedList sprite_list;
     Sprite *test;
+
+    String str;
 };
 
 bool InitGameData(AppData *ad, GameData *gd);

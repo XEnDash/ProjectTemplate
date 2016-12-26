@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+//#include "import_win32.h"
+//using namespace WINLIB;
+
+//#include "import_std.h"
+//using namespace STDLIB;
+
 #include "app.h"
 #include "string_functions.h"
 #include "file.h"

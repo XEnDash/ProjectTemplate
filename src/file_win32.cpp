@@ -1,6 +1,6 @@
 #include "file.h"
 
-#include "windows.h"
+#include "import_win32.h"
 #include "app.h"
 #include "log.h"
 #include "string_functions.h"

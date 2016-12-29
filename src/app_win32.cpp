@@ -1,9 +1,6 @@
 #include "app.h"
 
-//#include <windows.h>
 #include "import_win32.h"
-
-//#include <time.h>
 #include "import_std.h"
 
 #include "file.h"
@@ -27,7 +24,7 @@ GameData *gd;
 
 struct RendererInitData //NOTE(daniel): must be the same as in renderer_win32_ogl.cpp
 {
-    WINLIB::HDC dc;
+    HDC dc;
     uint16 win_w, win_h;
     uint16 scr_w, scr_h;
 };
@@ -36,7 +33,7 @@ void *App_Allocate(uint64 size, char *file, uint32 line)
 {
     DAssert(size != 0);
     
-    void *output = WINLIB::malloc(size);
+    void *output = malloc(size);
     
     if(output != 0)
     {
@@ -46,7 +43,7 @@ void *App_Allocate(uint64 size, char *file, uint32 line)
     {
 	FLog("ALLOCATION FAILLED!!! [ptr=0x%x, size=%llu, file=%s, line=%i]", output, size, file, line);
 	
-	WINLIB::MessageBox(0, "MEMORY ALLOCATION FAILED!!!", "Error", 0);
+	MessageBox(0, "MEMORY ALLOCATION FAILED!!!", "Error", 0);
 	ad->program_state = 0;
     }
     
@@ -58,7 +55,7 @@ void *App_Reallocate(void *ptr, uint64 size, char *file, uint32 line)
     DAssert(ptr);
     DAssert(size != 0);
     
-    void *output = WINLIB::realloc(ptr, size);
+    void *output = realloc(ptr, size);
     
     if(output != 0)
     {
@@ -77,7 +74,7 @@ void App_Free(void *ptr, char *file, uint32 line)
     DAssert(ptr);
     
     FLog("Free [ptr=0x%x, file=%s, line=%i]", ptr, file, line);
-    WINLIB::free(ptr);
+    free(ptr);
 }
 
 void App_MessageBox(char *message, char *title)
@@ -85,15 +82,15 @@ void App_MessageBox(char *message, char *title)
     DAssert(message);
     DAssert(title);
     
-    WINLIB::MessageBox(0, message, title, 0);
+    MessageBox(0, message, title, 0);
 }
 
 bool App_GetLastErrorMessage(char *msg, uint32 size)
 {
     DAssert(msg);
     
-    WINLIB::DWORD last_error = WINLIB::GetLastError();
-    if(!WINLIB::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, last_error, 0, msg, size, 0))
+    DWORD last_error = GetLastError();
+    if(!FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, last_error, 0, msg, size, 0))
 	return false;
 
     // HACK(daniel): the formated message is returned with a /r/n, we remove those
@@ -105,14 +102,14 @@ bool App_GetLastErrorMessage(char *msg, uint32 size)
 
 uint32 App_Random()
 {
-    return WINLIB::rand();
+    return rand();
 }
 
 uint64 App_GetTicks()
 {
-    WINLIB::LARGE_INTEGER counter;
+    LARGE_INTEGER counter;
     
-    if(!WINLIB::QueryPerformanceCounter(&counter))
+    if(!QueryPerformanceCounter(&counter))
     {
 	LogError("QueryPerformanceCounter failed.");
 	return 0;
@@ -125,9 +122,9 @@ double App_GetTimeDifference(uint64 start, uint64 end)
 {
     DAssert(start <= end);
 
-    WINLIB::LARGE_INTEGER freq;
+    LARGE_INTEGER freq;
     
-    if(!WINLIB::QueryPerformanceFrequency(&freq))
+    if(!QueryPerformanceFrequency(&freq))
     {
 	LogError("QueryPerformanceFrequency failed.");
 	return 0;
@@ -140,9 +137,9 @@ double App_GetTimeDifference(uint64 start, uint64 end)
 
 double App_GetTime()
 {
-    WINLIB::LARGE_INTEGER freq;
+    LARGE_INTEGER freq;
     
-    if(!WINLIB::QueryPerformanceFrequency(&freq))
+    if(!QueryPerformanceFrequency(&freq))
     {
 	LogError("QueryPerformanceFrequency failed.");
 	return 0;
@@ -150,9 +147,9 @@ double App_GetTime()
 
     DAssert(freq.QuadPart != 0);
 
-    WINLIB::LARGE_INTEGER counter;
+    LARGE_INTEGER counter;
     
-    if(!WINLIB::QueryPerformanceCounter(&counter))
+    if(!QueryPerformanceCounter(&counter))
     {
 	LogError("QueryPerformanceCounter failed.");
 	return 0;
@@ -166,16 +163,16 @@ void App_Sleep(uint64 ms)
     // TODO(daniel): what should we do when ms equals 0?
     // sometimes we do Sleep(0) or Sleep(1) if the game is out of focus
     // do we want to support it here?
-    WINLIB::Sleep(ms);
+    Sleep(ms);
 }
 
 void ProcessAppEvents()
 {
-    WINLIB::MSG msg;
-    while(WINLIB::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+    MSG msg;
+    while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
     { 
-	WINLIB::TranslateMessage(&msg); 
-	WINLIB::DispatchMessage(&msg); 
+	TranslateMessage(&msg); 
+	DispatchMessage(&msg); 
     }
 }
 
@@ -183,8 +180,8 @@ void QueryHardwareInfo(MachineData *md)
 {
     DAssert(md);
     
-    WINLIB::SYSTEM_INFO sys_info = { 0 };
-    WINLIB::GetSystemInfo(&sys_info);
+    SYSTEM_INFO sys_info = { 0 };
+    GetSystemInfo(&sys_info);
 
     md->oem_id = sys_info.dwOemId;
     md->processor_architecture = sys_info.wProcessorArchitecture;
@@ -264,7 +261,7 @@ void DeleteAppData(AppData *ad)
     }
 }
 
-void UpdateAppData(GameData *gd, WINLIB::HDC dc)
+void UpdateAppData(GameData *gd, HDC dc)
 {
     DAssert(gd);
 
@@ -307,7 +304,7 @@ void Quit()
     FILE_DestroyGlobalFilePool();
 }
 
-WINLIB::LRESULT CALLBACK WindowProc(WINLIB::HWND hwnd, WINLIB::UINT uMsg, WINLIB::WPARAM wParam, WINLIB::LPARAM lParam)
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch(uMsg)
     {
@@ -435,16 +432,16 @@ WINLIB::LRESULT CALLBACK WindowProc(WINLIB::HWND hwnd, WINLIB::UINT uMsg, WINLIB
 	}
     }
     
-    return WINLIB::DefWindowProc(hwnd, uMsg, wParam, lParam);
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-uint32 WinMainWrap(WINLIB::HINSTANCE hInstance, WINLIB::HINSTANCE hPrevInstance, WINLIB::LPSTR lpCmdLine, int nCmdShow)
+uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // NOTE(daniel): makes the windows scheduler timer check every 1 ms
     uint32 scheduler_period_ms = 1;
-    WINLIB::timeBeginPeriod(scheduler_period_ms);
+    timeBeginPeriod(scheduler_period_ms);
     
-    WINLIB::srand(STDLIB::time(0));
+    srand(time(0));
     
     if(!Log_Init(LOG_LEVEL_SIMPLE))
     {
@@ -470,26 +467,26 @@ uint32 WinMainWrap(WINLIB::HINSTANCE hInstance, WINLIB::HINSTANCE hPrevInstance,
 	return -1;
     }
     
-    WINLIB::WNDCLASS wndclass;
-    WINLIB::ZeroMemory(&wndclass, sizeof(WINLIB::WNDCLASS));
+    WNDCLASS wndclass;
+    ZeroMemory(&wndclass, sizeof(WNDCLASS));
 
     wndclass.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WindowProc; 
     wndclass.hInstance = hInstance;
     wndclass.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
     wndclass.hCursor = LoadCursor(hInstance, IDC_ARROW);
-    wndclass.hbrBackground = WINLIB::GetSysColorBrush(COLOR_ACTIVEBORDER);
+    wndclass.hbrBackground = GetSysColorBrush(COLOR_ACTIVEBORDER);
     wndclass.lpszMenuName = 0;
     wndclass.lpszClassName = CLASS_NAME;
 
-    if(!WINLIB::RegisterClass(&wndclass))
+    if(!RegisterClass(&wndclass))
     {
 	LogError("RegisterClass failed.");
 	Quit();
 	return -1;
     }
 
-    WINLIB::HWND hwnd = WINLIB::CreateWindow(CLASS_NAME, "OpenGL Window", WS_OVERLAPPEDWINDOW,
+    HWND hwnd = CreateWindow(CLASS_NAME, "OpenGL Window", WS_OVERLAPPEDWINDOW,
 			     0, 0, ad->win_w, ad->win_h, 0, 0, hInstance, 0);
     
     if(!hwnd)
@@ -499,10 +496,10 @@ uint32 WinMainWrap(WINLIB::HINSTANCE hInstance, WINLIB::HINSTANCE hPrevInstance,
 	return -1;
     }
 
-    WINLIB::ShowWindow(hwnd, SW_SHOW);
+    ShowWindow(hwnd, SW_SHOW);
 
     RendererInitData rid;
-    rid.dc = WINLIB::GetDC(hwnd);
+    rid.dc = GetDC(hwnd);
     rid.win_w = ad->win_w;
     rid.win_h = ad->win_h;
     rid.scr_w = ad->scr_w;
@@ -600,12 +597,12 @@ uint32 WinMainWrap(WINLIB::HINSTANCE hInstance, WINLIB::HINSTANCE hPrevInstance,
 #endif
     }
 
-    WINLIB::timeEndPeriod(scheduler_period_ms);
+    timeEndPeriod(scheduler_period_ms);
 
     return 0;
 }
 
-int CALLBACK WinMain(WINLIB::HINSTANCE hInstance, WINLIB::HINSTANCE hPrevInstance, WINLIB::LPSTR lpCmdLine, int nCmdShow)
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     uint32 result = WinMainWrap(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     Quit();

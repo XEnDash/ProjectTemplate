@@ -1,6 +1,6 @@
 #include "renderer.h"
 
-#include <windows.h>
+#include "import_win32.h"
 #include <gl/gl.h>
 #include "ogl_extensions.h"
 #include "log.h"

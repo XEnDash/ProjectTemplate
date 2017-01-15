@@ -49,4 +49,6 @@ uint32 App_Random();
 uint64 App_GetTicks();
 double App_GetTimeDifference(uint64 start, uint64 end);
 double App_GetTime();
-void App_Sleep(uint64 ms);
+
+void App_SleepInaccurate(uint64 ms);
+void App_SleepAccurate(uint64 ms);

@@ -158,12 +158,32 @@ double App_GetTime()
     return double(counter.QuadPart) / (double)(freq.QuadPart);
 }
 
-void App_Sleep(uint64 ms)
+void App_SleepInaccurate(uint64 ms)
 {
     // TODO(daniel): what should we do when ms equals 0?
     // sometimes we do Sleep(0) or Sleep(1) if the game is out of focus
     // do we want to support it here?
+
     Sleep(ms);
+}
+
+void App_SleepAccurate(uint64 ms)
+{
+    // TODO(daniel): test this to see how it behaves on different machines and if
+    // it's safe to be doing it this way
+
+    uint64 start = App_GetTicks();
+    uint64 now = App_GetTicks();
+
+    double wait = (double)(ms) / 1000.0;
+
+    // NOTE(daniel): for debugging
+    double diff;
+    
+    while((diff = App_GetTimeDifference(start, now)) < wait)
+    {
+	now = App_GetTicks();
+    }
 }
 
 void ProcessAppEvents()
@@ -574,6 +594,7 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 								game_update_timer_end);
 
 	uint64 app_update_timer_start = App_GetTicks();
+
 	UpdateAppData(gd, rid.dc);
 
 	uint64 app_update_timer_end = App_GetTicks();
@@ -600,7 +621,7 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	    sleep = desired_fps - frame_time_time_elapsed;
 	    if(sleep > 0)
 	    {
-		App_Sleep(sleep * 1000.0);
+		App_SleepAccurate(sleep * 1000.0);
 	    }
 	}
 
@@ -613,7 +634,7 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	sprintf(sec, "Frame: %i", game_loop_frames);
 	Log_BeginSection(sec);
 	
-	FLog("Time Elapsed: %fms", time_elapsed * 1000.0);
+	FLog("Time Elapsed For Previous Frame: %fms", time_elapsed * 1000.0);
 	FLog("Frame Time: %fms", frame_time_time_elapsed * 1000.0);
 	FLog("Game Update Time: %fms", game_update_time_elapsed * 1000.0);
 	FLog("App Update Time: %fms", app_update_time_elapsed * 1000.0);

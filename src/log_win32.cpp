@@ -275,8 +275,15 @@ void FLog(const char *s, ...)
     sprintf(log_buffer + log_buffer_used_size, "\n");
     log_buffer_used_size += 1;
 
+    // NOTE(daniel): timing DebugOutputLog because it takes a lot of time
+    //uint64 debug_output_timer_start = App_GetTicks();
+
     DebugOutputLog(buffer);
     DebugOutputLog("\n");
+    
+    //uint64 debug_output_timer_end = App_GetTicks();
+    //double debug_output_time_elapsed = App_GetTimeDifference(debug_output_timer_start,
+    //							     debug_output_timer_end);
     
     log_number_of_lines++;
     log_redraw = true;

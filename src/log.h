@@ -24,4 +24,6 @@ void Log_Enable();
 #define Log(s) SLog(s, __FILE__, __LINE__, false)
 #define LogError(s) SLog(s, __FILE__, __LINE__, true);
 
-#define DebugOutputLog(s) OutputDebugString(s)
+// NOTE(daniel): this takes WAAAAY to long
+//#define DebugOutputLog(s) OutputDebugString(s)
+#define DebugOutputLog(s)

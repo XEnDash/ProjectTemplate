@@ -164,6 +164,7 @@ void App_SleepInaccurate(uint64 ms)
     // sometimes we do Sleep(0) or Sleep(1) if the game is out of focus
     // do we want to support it here?
 
+    // NOTE(daniel): Win32 Sleep function only takes a SUGGESTED MINIMUM, it gurantees nothing
     Sleep(ms);
 }
 

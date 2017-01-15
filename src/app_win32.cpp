@@ -521,11 +521,13 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return -1;
     }
 
+    uint64 game_loop_frames = 0;
+    
     // TODO(daniel): query the actual monitor refresh rate and decide the game refresh rate
     // based on it
     uint32 monitor_refresh_rate_hz = 60;
     uint32 game_refresh_rate_hz = monitor_refresh_rate_hz;
-
+    
     double cur_time = App_GetTicks();
     double prev_time = App_GetTicks();
     double time_elapsed = 0.0;
@@ -534,10 +536,16 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     double sleep = 0;
     double desired_fps = 1.0 / (double)game_refresh_rate_hz;
 
-    bool to_sleep;
+    R_DisableVSync();
+    bool to_sleep = !R_IsVSyncEnabled();
+
+    uint64 frame_time_timer_start = App_GetTicks();
+    uint64 frame_time_timer_end = App_GetTicks();
+    double frame_time_time_elapsed = App_GetTimeDifference(frame_time_timer_start,
+							   frame_time_timer_end);
     
     ad->dt = desired_fps;
-
+    
     while(ad->program_state)
     {
 	// NOTE(daniel): if vsync is enabled SwapBuffers will sleep for us, if not
@@ -549,6 +557,8 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	prev_time = cur_time;
 	lag += time_elapsed;
 
+	frame_time_timer_start = App_GetTicks();
+	
 	ProcessAppEvents();
 
 	uint64 game_update_timer_start = App_GetTicks();
@@ -570,8 +580,6 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	double app_update_time_elapsed = App_GetTimeDifference(app_update_timer_start,
 							       app_update_timer_end);
 	
-	UpdateLogDisplay();
-	
 	uint64 swap_buffers_timer_start = App_GetTicks();
 
 	SwapBuffers(rid.dc);
@@ -580,21 +588,46 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	double swap_buffers_time_elapsed = App_GetTimeDifference(swap_buffers_timer_start,
 								 swap_buffers_timer_end);
 
+
+	frame_time_timer_end = App_GetTicks();
+	frame_time_time_elapsed = App_GetTimeDifference(frame_time_timer_start,
+							frame_time_timer_end);
+	
+	uint64 app_sleep_timer_start = App_GetTicks();
+	
 	if(to_sleep)
 	{
-	    sleep = desired_fps - time_elapsed;
+	    sleep = desired_fps - frame_time_time_elapsed;
 	    if(sleep > 0)
 	    {
-		App_Sleep(sleep);
+		App_Sleep(sleep * 1000.0);
 	    }
 	}
+
+	uint64 app_sleep_timer_end = App_GetTicks();
+	double app_sleep_time_elapsed = App_GetTimeDifference(app_sleep_timer_start,
+							      app_sleep_timer_end);
 	
-#if 0
+#if 1
+	char sec[2048];
+	sprintf(sec, "Frame: %i", game_loop_frames);
+	Log_BeginSection(sec);
+	
 	FLog("Time Elapsed: %fms", time_elapsed * 1000.0);
+	FLog("Frame Time: %fms", frame_time_time_elapsed * 1000.0);
 	FLog("Game Update Time: %fms", game_update_time_elapsed * 1000.0);
 	FLog("App Update Time: %fms", app_update_time_elapsed * 1000.0);
 	FLog("Swap Buffers Time: %fms", swap_buffers_time_elapsed * 1000.0);
+	FLog("App Sleep Time: %fms", app_sleep_time_elapsed * 1000.0);
+
+	FLog("VSync: %i", R_IsVSyncEnabled());
+	
+	Log_EndSection();
 #endif
+
+	UpdateLogDisplay();
+	
+	game_loop_frames++;
     }
 
     timeEndPeriod(scheduler_period_ms);

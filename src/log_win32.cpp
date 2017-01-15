@@ -13,7 +13,7 @@
 #define LOG_HEIGHT 480
 
 char *log_buffer;
-uint32 log_buffer_size = 1*1024*1024;
+uint32 log_buffer_size = 16*1024*1024;
 uint32 log_buffer_used_size = 0;
 
 HWND log_hwnd = 0;
@@ -33,6 +33,8 @@ bool log_initialized = false;
 bool log_redraw = false;
 
 uint32 log_level;
+
+bool log_enabled = false;
 
 LRESULT CALLBACK LogWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -169,6 +171,8 @@ bool Log_Init(uint32 level)
 
     Log_SetLevel(level);
 
+    log_enabled = true;
+
     Log("=== Log Initialized ===");
     
     return true;
@@ -185,6 +189,9 @@ void SLog(const char *s, char *file, uint32 line, bool print_meta)
     if(!log_initialized)
 	return;
 
+    if(!log_enabled)
+	return;
+    
     if(log_level == LOG_LEVEL_NONE)
 	return;
     
@@ -233,6 +240,9 @@ void FLog(const char *s, ...)
     if(!log_initialized)
 	return;
 
+    if(!log_enabled)
+	return;
+
     if(log_level == LOG_LEVEL_NONE)
 	return;
 
@@ -274,6 +284,9 @@ void FLog(const char *s, ...)
 
 void Log_BeginSection(const char *s)
 {
+    if(!log_enabled)
+	return;
+    
     log_indent_level = min32(log_indent_level, log_max_indent_level);
     char indentation_string[log_max_indent_level];
     for(uint32 i = 0; i < log_indent_level; i++)
@@ -288,12 +301,18 @@ void Log_BeginSection(const char *s)
 
 void Log_EndSection()
 {
+    if(!log_enabled)
+	return;
+    
     log_indent_level -= log_indent_increment;
     SLog("}", 0, 0, false);
 }
 
 void UpdateLogDisplay()
 {
+    if(!log_enabled)
+	return;
+    
     if(log_redraw)
     {
 	RedrawWindow(log_hwnd, 0, 0, RDW_INVALIDATE);
@@ -303,6 +322,9 @@ void UpdateLogDisplay()
 
 bool DumpLogToFile()
 {
+    if(!log_enabled)
+	return false;
+    
     File log_file;
     if(!FILE_Open(&log_file, LOG_FILE_NAME, OPEN_MODE_ALWAYS))
 	return false;
@@ -316,4 +338,14 @@ bool DumpLogToFile()
     FILE_Close(&log_file);
 
     return true;
+}
+
+void Log_Disable()
+{
+    log_enabled = false;
+}
+
+void Log_Enable()
+{
+    log_enabled = true;
 }

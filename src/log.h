@@ -18,6 +18,9 @@ void Log_EndSection();
 void UpdateLogDisplay();
 bool DumpLogToFile();
 
+void Log_Disable();
+void Log_Enable();
+
 #define Log(s) SLog(s, __FILE__, __LINE__, false)
 #define LogError(s) SLog(s, __FILE__, __LINE__, true);
 

@@ -4,7 +4,6 @@
 #include "file.h"
 #include "sprite.h"
 #include "bitmap.h"
-#include "sstring.h"
 
 #define DEBUG_SPRITE_LIST_MAX 32 // 1024*64
 

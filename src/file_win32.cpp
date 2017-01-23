@@ -3,7 +3,6 @@
 #include "import_win32.h"
 #include "app.h"
 #include "log.h"
-#include "string_functions.h"
 #include "memory_pool.h"
 
 struct FileHandle : MP_Element
@@ -91,7 +90,7 @@ bool FILE_Open(File *f, char *filename, ENUM_FILE_MODE mode)
     
     f->size = li.QuadPart;
 
-    STR_Copy(f->filename, filename);
+    String::Copy(f->filename, filename);
 
     return true;
 }

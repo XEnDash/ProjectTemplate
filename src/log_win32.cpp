@@ -4,7 +4,6 @@
 #include "import_std.h"
 
 #include "app.h"
-#include "string_functions.h"
 #include "file.h"
 #include "umath.h"
 
@@ -212,7 +211,7 @@ void SLog(const char *s, char *file, uint32 line, bool print_meta)
     else
 	sprintf(buffer, "%s%s", indentation_string, s);
     
-    uint32 s_len = STR_Length((char *)buffer);
+    uint32 s_len = String::CalcLength((char *)buffer);
 
     if(log_buffer_used_size + s_len + 1 > log_buffer_size)
     {
@@ -259,7 +258,7 @@ void FLog(const char *s, ...)
     vsprintf(buffer, s, ap);
     va_end(ap);
 
-    uint32 buf_len = STR_Length((char *)buffer);
+    uint32 buf_len = String::CalcLength((char *)buffer);
 
     if(log_buffer_used_size + buf_len + log_indent_level + 1 > log_buffer_size)
     {

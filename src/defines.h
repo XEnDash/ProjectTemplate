@@ -23,6 +23,39 @@ typedef int32 bool32;
 #define MEGABYTE(x) KILOBYTE((uint64)(x) * (uint64)(1024))
 #define GIGABYTE(x) MEGABYTE((uint64)(x) * (uint64)(1024))
 
+#define STRING_COUNTING_LIMIT 65536 // in case the input is bad we prevent infinite loops after this much counts
+
+struct String
+{
+    char *c_str;
+    uint32 length;
+    bool32 allocated;
+
+    String();
+    String(char *str);
+    String(int64 i);
+
+    bool32 Allocate(uint32 size);
+    bool32 Reallocate(uint32 size);
+    bool32 Deallocate();
+
+    void operator +=(char *str);
+    void operator +=(int64 i);
+
+    void operator +(char *str);
+    void operator +(int64 i);
+
+    bool32 Assign(char *str); // NOTE(daniel): assignment implicitly allocates! adds one byte for zero termindated
+    bool32 Append(char *str);
+    uint32 Length();
+
+    static uint32 CalcLength(char *str);
+    static bool Copy(char *dest, char *src);
+    static bool CopyLim(char *dest, char *src, uint32 size);
+    static String ParseInt(int64 i);
+    static void ParseIntIntoCStr(char *c_str, int64 i);
+};
+
 struct Color
 {
 public:
@@ -43,6 +76,8 @@ public:
 #define max3(a, b, c) (fmax(fmax(a, b), c))
 
 #define Clamp(c, min, max) { if(c < min) c = min; if(c > max) c = max; }
+
+uint32 GetNumberOfCharactersInNumber(int64 i);
 
 #define M_PI 3.14159265359
 #define M_PI_F 3.14159265359f

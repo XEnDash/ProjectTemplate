@@ -7,7 +7,6 @@
 #include "texture.h"
 #include "linked_list.h"
 #include "double_linked_list.h"
-#include "sstring.h"
 
 struct GameData
 {

@@ -2,7 +2,6 @@
 
 #include "app.h"
 #include "file.h"
-#include "string_functions.h"
 
 bool BMP_Load(Bitmap *bmp, uint8 *buffer, uint64 size, char filename[64])
 {
@@ -31,7 +30,7 @@ bool BMP_Load(Bitmap *bmp, uint8 *buffer, uint64 size, char filename[64])
 	{
 	    BMP_BitmapHeaderV3 *bitmap_header = (BMP_BitmapHeaderV3 *)(buffer + 14);
 
-	    STR_Copy(bmp->filename, filename);
+	    String::Copy(bmp->filename, filename);
 	    bmp->width = bitmap_header->width;
 	    bmp->height = bitmap_header->height;
 	    bmp->pixels = (uint32 *)lnew(sizeof(uint32) * bmp->width * bmp->height);

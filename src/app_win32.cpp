@@ -9,7 +9,6 @@
 #include "renderer.h"
 #include "sprite.h"
 #include "game.h"
-#include "string_functions.h"
 
 #define CLASS_NAME "GameWindowCN"
 
@@ -37,11 +36,15 @@ void *App_Allocate(uint64 size, char *file, uint32 line)
     
     if(output != 0)
     {
+#ifdef LOG_ALLOCATIONS
 	FLog("Allocation [ptr=0x%x, size=%llu, file=%s, line=%i]", output, size, file, line);
+#endif DONT_LOG_ALLOCATIONS
     }
     else
     {
+#ifdef LOG_ALLOCATIONS
 	FLog("ALLOCATION FAILLED!!! [ptr=0x%x, size=%llu, file=%s, line=%i]", output, size, file, line);
+#endif DONT_LOG_ALLOCATIONS
 	
 	MessageBox(0, "MEMORY ALLOCATION FAILED!!!", "Error", 0);
 	ad->program_state = 0;
@@ -59,11 +62,15 @@ void *App_Reallocate(void *ptr, uint64 size, char *file, uint32 line)
     
     if(output != 0)
     {
+#ifdef LOG_ALLOCATIONS
 	FLog("Rellocation [ptr=0x%x, size=%llu, file=%s, line=%i]", output, size, file, line);
+#endif DONT_LOG_ALLOCATIONS
     }
     else
     {
+#ifdef LOG_ALLOCATIONS
 	FLog("REALLOCATION FAILED!!! [ptr=0x%x, size=%llu, file=%s, line=%i]", output, size, file, line);
+#endif DONT_LOG_ALLOCATIONS
     }
     
     return output;
@@ -72,8 +79,11 @@ void *App_Reallocate(void *ptr, uint64 size, char *file, uint32 line)
 void App_Free(void *ptr, char *file, uint32 line)
 {
     DAssert(ptr);
-    
+
+#ifdef LOG_ALLOCATIONS
     FLog("Free [ptr=0x%x, file=%s, line=%i]", ptr, file, line);
+#endif DONT_LOG_ALLOCATIONS
+    
     free(ptr);
 }
 
@@ -94,7 +104,7 @@ bool App_GetLastErrorMessage(char *msg, uint32 size)
 	return false;
 
     // HACK(daniel): the formated message is returned with a /r/n, we remove those
-    uint32 len = STR_Length(msg);
+    uint32 len = String::CalcLength(msg);
     msg[len - 3] = 0;
 
     return true;
@@ -456,6 +466,48 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
+void TestString()
+{
+    String s1;
+    
+    String s2 = String("Hello World!");
+    uint32 s2_len = s2.Length();
+
+    String s3 = "This is assigned!";
+    uint32 s3_len = s3.Length();
+
+    String s4 = "This is going to get deleted!";
+    uint32 s4_len = s4.Length();
+
+    s4 = "A new string";
+    s4_len = s4.Length();
+
+    String s5 = "i'm not ";
+    s5.Append("finished!");
+
+    String s6 = "operator ";
+    s6 += "overloaded";
+
+    String s7 = String::ParseInt(12345);
+
+    String s8 = "The Number is: ";
+    s8 += 876235;
+
+    String s9 = "Why the negative attitude?: ";
+    s9 += -54321;
+    
+#if 0
+    Log_BeginSection("string int parsing test");
+    for(int i = 0; i < 9999; i++)
+    {
+	String s = "Mighty number: ";
+	s += -i;
+	Log(s.c_str);
+    }
+    Log_EndSection();
+#endif
+}
+
 uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // NOTE(daniel): makes the windows scheduler timer check every 1 ms
@@ -477,6 +529,8 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     // NOTE(daniel): From here on out it is possible to dump the log to a file.
+
+    TestString();
 
     ad = (AppData *)lnew(sizeof(AppData));
     DAssert(ad);
@@ -630,7 +684,7 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	double app_sleep_time_elapsed = App_GetTimeDifference(app_sleep_timer_start,
 							      app_sleep_timer_end);
 	
-#if 1
+#if 0
 	char sec[2048];
 	sprintf(sec, "Frame: %i", game_loop_frames);
 	Log_BeginSection(sec);

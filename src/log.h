@@ -27,7 +27,7 @@ void Log_Enable();
 #define LogError(s) SLog(s, __FILE__, __LINE__, true);
 
 // NOTE(daniel): will make the game loop synchronization wrong
-#define OUTPUT_DEBUG_TO_VS_LOG
+//#define OUTPUT_DEBUG_TO_VS_LOG
 
 #ifdef OUTPUT_DEBUG_TO_VS_LOG
 // NOTE(daniel): this takes WAAAAY to log

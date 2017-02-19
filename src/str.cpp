@@ -9,6 +9,30 @@ String::String()
     this->allocated = false;
 }
 
+String::~String()
+{
+    if(this->allocated)
+    {
+	this->Deallocate();
+    }
+
+    this->length = 0;
+    this->c_str = 0;
+    this->allocated = false;
+}
+
+String::String(const String &s)
+{
+    this->length = 0;
+    this->c_str = 0;
+    this->allocated = false;
+    
+    if(!this->Assign(s.c_str))
+    {
+	LogError("String::Assign failed");
+    }
+}
+
 String::String(char *str)
 {
     this->length = 0;
@@ -100,6 +124,35 @@ bool32 String::Deallocate()
     return true;
 }
 
+void String::operator =(char *str)
+{
+    this->length = 0;
+    this->c_str = 0;
+    this->allocated = false;
+    
+    if(!this->Assign(str))
+    {
+	LogError("String::Assign failed");
+    }
+}
+
+void String::operator =(int64 i)
+{
+    this->length = 0;
+    this->c_str = 0;
+    this->allocated = false;
+
+    uint32 size = GetNumberOfCharactersInNumber(i);
+    
+    if(!this->Allocate(size))
+    {
+	LogError("String::Allocate failed");
+    }
+    
+    ParseIntIntoCStr(this->c_str, i);
+    this->length = CalcLength(this->c_str);
+}
+
 void String::operator +=(char *str)
 {
     if(!this->Append(str))
@@ -123,24 +176,32 @@ void String::operator +=(int64 i)
     this->length = CalcLength(this->c_str);
 }
 
-/*void String::operator +(char *str)
+String String::operator +(char *str)
 {
-    if(!this->->Append(str))
+    if(!this->Append(str))
     {
 	LogError("String::Append failed");
     }
+
+    return *this;
 }
-
-void String::operator +(int64 i)
+ 
+String String::operator +(int64 i)
 {
-    String number = String::ParseInt(i);
-    if(!this->Append(number.c_str))
-    {
-	LogError("String::Append failed");
-    }
+    uint32 prev_len = this->length;
 
-    number.Deallocate();
-    }*/
+    uint32 size = GetNumberOfCharactersInNumber(i);
+    
+    if(!this->Reallocate(prev_len + size))
+    {
+	LogError("String::Reallocate failed");
+    }
+    
+    ParseIntIntoCStr(&this->c_str[prev_len], i);
+    this->length = CalcLength(this->c_str);
+
+    return *this;
+}
 
 bool32 String::Assign(char *str)
 {

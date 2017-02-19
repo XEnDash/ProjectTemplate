@@ -495,10 +495,11 @@ void TestString()
 
     String s9 = "Why the negative attitude?: ";
     s9 += -54321;
-    
+
+    Log((String("This will go to the log: ") + 11111));
 #if 0
     Log_BeginSection("string int parsing test");
-    for(int i = 0; i < 9999; i++)
+    for(int i = 0; i < 99999; i++)
     {
 	String s = "Mighty number: ";
 	s += -i;
@@ -697,6 +698,20 @@ uint32 WinMainWrap(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	FLog("App Sleep Time: %fms", app_sleep_time_elapsed * 1000.0);
 
 	FLog("VSync: %i", R_IsVSyncEnabled());
+	
+	Log_EndSection();
+#endif
+#if 1
+	Log_BeginSection(String("Frame: ") + game_loop_frames);
+	
+	Log(String("Time Elapsed For Previous Frame: ") + time_elapsed * 1000000.0);
+	Log(String("Frame Time: ") + frame_time_time_elapsed * 1000000.0);
+	Log(String("Game Update Time: ") + game_update_time_elapsed * 1000000.0);
+	Log(String("App Update Time: ") + app_update_time_elapsed * 1000000.0);
+	Log(String("Swap Buffers Time: ") + swap_buffers_time_elapsed * 1000000.0);
+	Log(String("App Sleep Time: ") + app_sleep_time_elapsed * 1000000.0);
+
+	Log(("VSync: ") + R_IsVSyncEnabled());
 	
 	Log_EndSection();
 #endif

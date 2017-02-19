@@ -17,8 +17,6 @@ struct GameData
     //MemoryPool mp;
     DoubleLinkedList sprite_list;
     Sprite *test;
-
-    String str;
 };
 
 bool InitGameData(AppData *ad, GameData *gd);

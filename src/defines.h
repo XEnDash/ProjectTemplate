@@ -32,6 +32,8 @@ struct String
     bool32 allocated;
 
     String();
+    ~String();
+    String(const String &s);
     String(char *str);
     String(int64 i);
 
@@ -39,11 +41,16 @@ struct String
     bool32 Reallocate(uint32 size);
     bool32 Deallocate();
 
+    operator char*() { return this->c_str; }
+
+    void operator =(char *str);
+    void operator =(int64 i);
+
     void operator +=(char *str);
     void operator +=(int64 i);
 
-    void operator +(char *str);
-    void operator +(int64 i);
+    String operator +(char *str);
+    String operator +(int64 i);
 
     bool32 Assign(char *str); // NOTE(daniel): assignment implicitly allocates! adds one byte for zero termindated
     bool32 Append(char *str);

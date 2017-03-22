@@ -4,6 +4,8 @@
 
 String::String()
 {
+    num_of_string_objects++;
+    
     this->length = 0;
     this->c_str = 0;
     this->allocated = false;
@@ -11,6 +13,8 @@ String::String()
 
 String::~String()
 {
+    num_of_string_objects++;
+    
     if(this->allocated)
     {
 	this->Deallocate();
@@ -23,6 +27,8 @@ String::~String()
 
 String::String(const String &s)
 {
+    num_of_string_objects++;
+    
     this->length = 0;
     this->c_str = 0;
     this->allocated = false;
@@ -35,6 +41,8 @@ String::String(const String &s)
 
 String::String(char *str)
 {
+    num_of_string_objects++;
+    
     this->length = 0;
     this->c_str = 0;
     this->allocated = false;
@@ -47,6 +55,8 @@ String::String(char *str)
 
 String::String(int64 i)
 {
+    num_of_string_objects++;
+    
     this->length = 0;
     this->c_str = 0;
     this->allocated = false;
@@ -66,6 +76,9 @@ bool32 String::Allocate(uint32 size)
 {
     DAssert(size);
 
+    num_of_string_allocations++;
+    size_of_string_bytes_allocated += size;
+    
     if(this->allocated)
     {
 	ldelete(this->c_str);
@@ -91,6 +104,9 @@ bool32 String::Reallocate(uint32 size)
 {
     DAssert(size);
 
+    num_of_string_reallocations++;
+    size_of_string_bytes_reallocated += size;
+    
     if(!this->allocated)
     {
 	this->Allocate(size);
@@ -114,6 +130,9 @@ bool32 String::Deallocate()
 {
     DAssert(this->allocated);
     DAssert(this->c_str);
+
+    num_of_string_deallocations++;
+    size_of_string_bytes_deallocated += this->length;
 
     ldelete(this->c_str);
     this->c_str = 0;

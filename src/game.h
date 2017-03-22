@@ -15,7 +15,7 @@ struct GameData
     char *tex_filename;
 
     //MemoryPool mp;
-    DoubleLinkedList sprite_list;
+    SpriteList sprite_list;
     Sprite *test;
 };
 

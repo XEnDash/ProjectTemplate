@@ -25,6 +25,14 @@ typedef int32 bool32;
 
 #define STRING_COUNTING_LIMIT 65536 // in case the input is bad we prevent infinite loops after this much counts
 
+static uint32 num_of_string_objects;
+static uint32 num_of_string_allocations;
+static uint32 num_of_string_deallocations;
+static uint32 num_of_string_reallocations;
+static uint32 size_of_string_bytes_allocated;
+static uint32 size_of_string_bytes_reallocated;
+static uint32 size_of_string_bytes_deallocated;
+
 struct String
 {
     char *c_str;

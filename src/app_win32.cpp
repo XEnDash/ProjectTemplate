@@ -301,12 +301,12 @@ void UpdateAppData(GameData *gd, HDC dc)
     if(gd->tex)
 	R_SetTexture(gd->tex);
 
-    Sprite *sprite = (Sprite *)gd->sprite_list.first_element;
+    Sprite *sprite = Sprite_GetFirst(&gd->sprite_list);
 
     while(sprite)
     {
 	R_Sprite(sprite, Color::white);
-	sprite = (Sprite *)DoubleLinkedList_GetNext(&sprite->dll_element);
+	sprite = Sprite_GetNext(sprite);
     }
 	
     R_End();

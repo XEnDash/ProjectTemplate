@@ -76,13 +76,12 @@ bool InitGameData(AppData *ad, GameData *gd)
 	//return false;
     }
 
-    if(!DoubleLinkedList_Init(&gd->sprite_list, sizeof(Sprite), DEBUG_SPRITE_LIST_MAX))
+    if(!Sprite_AllocateList(&gd->sprite_list, DEBUG_SPRITE_LIST_MAX))
 	return false;
 
     for(int i = 0; i < DEBUG_SPRITE_LIST_MAX + 10; i++)
     {
-	Sprite *s = (Sprite *)DoubleLinkedList_GetNew(&gd->sprite_list);
-	gd->test = s;
+	Sprite *s = Sprite_Allocate(&gd->sprite_list);
 	if(s == 0)
 	    break;
 	
@@ -91,10 +90,10 @@ bool InitGameData(AppData *ad, GameData *gd)
 	s->rot = App_Random() % 360;
     }
 
-    DoubleLinkedList_Free(&gd->sprite_list, gd->sprite_list.last_element);
+    Sprite_Free(&gd->sprite_list, Sprite_GetLast(&gd->sprite_list));
     
     //gd->test = (Sprite *)LinkedList_GetNew(&gd->sprite_list);
-    gd->test = (Sprite *)gd->sprite_list.last_element;
+    gd->test = Sprite_GetLast(&gd->sprite_list);
     DAssert(gd->test);
     
     gd->test->pos = V2(400, 300);
@@ -113,13 +112,12 @@ void UpdateGameData(AppData *ad, GameData *gd)
 #if 0
     while(gd->sprite_list.last_element)
     {
-	DoubleLinkedList_Free(&gd->sprite_list, gd->sprite_list.last_element);
+	Sprite_Free(&gd->sprite_list, gd->sprite_list.last_element);
     }
 
     for(int i = 0; i < DEBUG_SPRITE_LIST_MAX + 10; i++)
     {
-	Sprite *s = (Sprite *)DoubleLinkedList_GetNew(&gd->sprite_list);
-	gd->test = s;
+	Sprite *s = Sprite_Allocate(&gd->sprite_list);
 	if(s == 0)
 	    break;
 	
@@ -129,7 +127,7 @@ void UpdateGameData(AppData *ad, GameData *gd)
     }
 #endif
 
-    gd->test = (Sprite *)gd->sprite_list.last_element;
+    gd->test = Sprite_GetLast(&gd->sprite_list);
     
     float dt = ad->dt;
 
@@ -242,7 +240,7 @@ void DeleteGameData(AppData *ad, GameData *gd)
 {
     if(gd)
     {
-	DoubleLinkedList_DestroyList(&gd->sprite_list);
+	Sprite_DeallocateList(&gd->sprite_list);
     
 	G_UnloadTexture(&gd->tex);
 	DoubleLinkedList_DestroyList(&gd->texture_list);
